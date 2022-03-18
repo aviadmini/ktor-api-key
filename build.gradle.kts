@@ -6,17 +6,14 @@ plugins {
     kotlin("jvm") version "1.6.10"
 
     `maven-publish`
-    signing
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
 
-    id("net.nemerosa.versioning") version "2.15.1"
     id("org.jetbrains.dokka") version "1.6.10"
     id("io.gitlab.arturbosch.detekt") version "1.19.0"
 }
 
 group = "dev.forst"
 base.archivesName.set("ktor-api-key")
-version = (versioning.info?.tag ?: versioning.info?.lastTag ?: versioning.info?.build) ?: "SNAPSHOT"
+version = "SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -125,26 +122,6 @@ publishing {
                     url.set("https://github.com/LukasForst/ktor-api-key")
                 }
             }
-        }
-    }
-}
-
-signing {
-    val signingKeyId = project.findProperty("gpg.keyId") as String? ?: System.getenv("GPG_KEY_ID")
-    val signingKey = project.findProperty("gpg.key") as String? ?: System.getenv("GPG_KEY")
-    val signingPassword = project.findProperty("gpg.keyPassword") as String? ?: System.getenv("GPG_KEY_PASSWORD")
-
-    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-    sign(publishing.publications[publication])
-}
-
-nexusPublishing {
-    repositories {
-        sonatype {
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-            username.set(project.findProperty("ossrh.username") as String? ?: System.getenv("OSSRH_USERNAME"))
-            password.set(project.findProperty("ossrh.password") as String? ?: System.getenv("OSSRH_PASSWORD"))
         }
     }
 }
