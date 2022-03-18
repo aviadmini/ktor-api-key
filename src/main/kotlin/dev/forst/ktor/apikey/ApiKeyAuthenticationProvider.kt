@@ -1,17 +1,17 @@
 package dev.forst.ktor.apikey
 
-import io.ktor.application.ApplicationCall
-import io.ktor.application.call
-import io.ktor.auth.Authentication
-import io.ktor.auth.AuthenticationContext
-import io.ktor.auth.AuthenticationFailedCause
-import io.ktor.auth.AuthenticationPipeline
-import io.ktor.auth.AuthenticationProcedureChallenge
-import io.ktor.auth.AuthenticationProvider
-import io.ktor.auth.Principal
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.application.call
+import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.AuthenticationContext
+import io.ktor.server.auth.AuthenticationFailedCause
+import io.ktor.server.auth.AuthenticationPipeline
+import io.ktor.server.auth.AuthenticationProcedureChallenge
+import io.ktor.server.auth.AuthenticationProvider
+import io.ktor.server.auth.Principal
 import io.ktor.http.HttpStatusCode
-import io.ktor.request.header
-import io.ktor.response.respond
+import io.ktor.server.request.header
+import io.ktor.server.response.respond
 import io.ktor.util.pipeline.PipelineInterceptor
 
 /**

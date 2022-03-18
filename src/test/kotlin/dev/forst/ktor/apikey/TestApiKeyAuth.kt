@@ -1,12 +1,13 @@
 package dev.forst.ktor.apikey
 
-import io.ktor.application.call
-import io.ktor.auth.Principal
-import io.ktor.http.HttpMethod
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.server.application.call
+import io.ktor.server.auth.Principal
 import io.ktor.http.HttpStatusCode
-import io.ktor.response.respond
-import io.ktor.server.testing.handleRequest
-import io.ktor.server.testing.withTestApplication
+import io.ktor.server.response.respond
+import io.ktor.server.testing.testApplication
 import org.junit.jupiter.api.Test
 import java.util.UUID
 import kotlin.test.assertEquals
@@ -25,24 +26,21 @@ class TestApiKeyAuth {
             validate { header -> header.takeIf { it == apiKey }?.let { ApiKeyPrincipal(it) } }
         }
 
-        withTestApplication(module) {
-            handleRequest(HttpMethod.Get, Routes.open).apply {
-                assertEquals(HttpStatusCode.OK, response.status())
-            }
+        testApplication {
+            application(module)
+            val response = client.get(Routes.open) { }
+            assertEquals(HttpStatusCode.OK, response.status)
 
-            handleRequest(HttpMethod.Get, Routes.open) {
-                addHeader(defaultHeader, apiKey)
-            }.apply {
-                assertEquals(HttpStatusCode.OK, response.status())
+            val response2 = client.get(Routes.open) {
+                header(defaultHeader, apiKey)
             }
+            assertEquals(HttpStatusCode.OK, response2.status)
 
-            handleRequest(HttpMethod.Get, Routes.open) {
-                addHeader(defaultHeader, "$apiKey-wrong")
-            }.apply {
-                assertEquals(HttpStatusCode.OK, response.status())
+            val response3 = client.get(Routes.open) {
+                header(defaultHeader, "$apiKey-wrong")
             }
+            assertEquals(HttpStatusCode.OK, response3.status)
         }
-
     }
 
     @Test
@@ -53,23 +51,21 @@ class TestApiKeyAuth {
             validate { header -> header.takeIf { it == apiKey }?.let { ApiKeyPrincipal(it) } }
         }
 
-        withTestApplication(module) {
-            handleRequest(HttpMethod.Get, Routes.authenticated) {
-                addHeader(defaultHeader, apiKey)
-            }.apply {
-                assertEquals(HttpStatusCode.OK, response.status())
-                val principal = receive<ApiKeyPrincipal>()
-                assertEquals(principal, ApiKeyPrincipal(apiKey))
+        testApplication {
+            application(module)
+            val response = client.get(Routes.authenticated) {
+                header(defaultHeader, apiKey)
             }
+            assertEquals(HttpStatusCode.OK, response.status)
+            val principal = response.body<ApiKeyPrincipal>()
+            assertEquals(principal, ApiKeyPrincipal(apiKey))
 
-            handleRequest(HttpMethod.Get, Routes.authenticated) {
-                addHeader(defaultHeader, "$apiKey-wrong")
-            }.apply {
-                assertEquals(HttpStatusCode.Unauthorized, response.status())
+            val response2 = client.get(Routes.authenticated) {
+                header(defaultHeader, "$apiKey-wrong")
             }
+            assertEquals(HttpStatusCode.Unauthorized, response2.status)
         }
     }
-
 
     @Test
     fun `test auth should accept valid api key`() {
@@ -84,14 +80,14 @@ class TestApiKeyAuth {
             validate { header -> header.takeIf { it == apiKey }?.let { ApiKeyPrincipal(it) } }
         }
 
-        withTestApplication(module) {
-            handleRequest(HttpMethod.Get, Routes.authenticated) {
-                addHeader(header, apiKey)
-            }.apply {
-                assertEquals(HttpStatusCode.OK, response.status())
-                val principal = receive<ApiKeyPrincipal>()
-                assertEquals(principal, ApiKeyPrincipal(apiKey))
+        testApplication {
+            application(module)
+            val response = client.get(Routes.authenticated) {
+                header(header, apiKey)
             }
+            assertEquals(HttpStatusCode.OK, response.status)
+            val principal = response.body<ApiKeyPrincipal>()
+            assertEquals(principal, ApiKeyPrincipal(apiKey))
         }
     }
 
@@ -107,20 +103,19 @@ class TestApiKeyAuth {
             validate { header -> header.takeIf { it == apiKey }?.let { ApiKeyPrincipal(it) } }
         }
 
-        withTestApplication(module) {
-            handleRequest(HttpMethod.Get, Routes.authenticated) {
-                addHeader(header, apiKey)
-            }.apply {
-                assertEquals(HttpStatusCode.OK, response.status())
-                val principal = receive<ApiKeyPrincipal>()
-                assertEquals(principal, ApiKeyPrincipal(apiKey))
+        testApplication {
+            application(module)
+            val response = client.get(Routes.authenticated) {
+                header(header, apiKey)
             }
+            assertEquals(HttpStatusCode.OK, response.status)
+            val principal = response.body<ApiKeyPrincipal>()
+            assertEquals(principal, ApiKeyPrincipal(apiKey))
 
-            handleRequest(HttpMethod.Get, Routes.authenticated) {
-                addHeader(header, "$apiKey-wrong")
-            }.apply {
-                assertEquals(errorStatus, response.status())
+            val response2 = client.get(Routes.authenticated) {
+                header(header, "$apiKey-wrong")
             }
+            assertEquals(errorStatus, response2.status)
         }
     }
 }

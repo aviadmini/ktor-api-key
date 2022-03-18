@@ -25,15 +25,16 @@ repositories {
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
     // Ktor server dependencies
-    val ktorVersion = "1.6.7"
+    val ktorVersion = "2.0.0-beta-1"
     compileOnly("io.ktor", "ktor-server-core", ktorVersion)
-    compileOnly("io.ktor", "ktor-auth", ktorVersion)
+    compileOnly("io.ktor", "ktor-server-auth", ktorVersion)
 
     // testing
     testImplementation("io.ktor", "ktor-server-core", ktorVersion)
     testImplementation("io.ktor", "ktor-server-test-host", ktorVersion)
-    testImplementation("io.ktor", "ktor-auth", ktorVersion)
-    testImplementation("io.ktor", "ktor-jackson", ktorVersion)
+    testImplementation("io.ktor", "ktor-server-auth", ktorVersion)
+    testImplementation("io.ktor", "ktor-server-content-negotiation", ktorVersion)
+    testImplementation("io.ktor", "ktor-serialization-jackson", ktorVersion)
     testImplementation(kotlin("test"))
     testImplementation(kotlin("stdlib-jdk8"))
 
